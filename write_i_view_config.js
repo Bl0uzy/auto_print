@@ -3,6 +3,18 @@ const fs = require('fs');
 async function writeFile(printerName,printerFormat) {
   const contenuDuFichier = `; UNICODE FILE - edit with care ;-)
 
+[Language]
+DLL=ENGLISH
+Lang=English
+[Toolbar]
+Skin=gnome-colors-wise_32.png
+Size=32
+[WinPosition]
+xKoord=-2560
+yKoord=0
+Width=1923
+Height=1400
+Maximized=0
 [Print]
 AlwaysDefPrinter=0
 AutoRotate=1
@@ -31,7 +43,23 @@ Size=127
 Src=15
 Color=2
 Duplex=1
-SizeTxt=${printerFormat}`;
+SizeTxt=${printerFormat}
+[RecentFiles]
+File0=
+File1=
+File2=
+File3=
+File4=
+File5=
+File6=
+File7=
+File8=
+File9=
+File10=
+File11=
+File12=
+File13=
+File14=`;
 
   await new Promise((resolve, reject)=>{
     fs.writeFile('i_view64_2.ini', contenuDuFichier, function (erreur) {
