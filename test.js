@@ -1,6 +1,6 @@
 const mdns = require('mdns-js')
 
-const TIMEOUT = 5000; //5 seconds
+const TIMEOUT = 500; //5 seconds
 
 const browser = mdns.createBrowser(mdns.tcp('ipp'));
 

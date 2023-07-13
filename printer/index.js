@@ -1,6 +1,10 @@
 const axios = require("axios");
 const ipp = require("ipp");
 const Printer_data = require('../getters/index.js')
+const fs = require('fs');
+const { exec } = require('child_process');
+
+const path = require('path');
 require('dotenv').config();
 
 class Printer {
@@ -22,14 +26,16 @@ class Printer {
                 baseUrl = process.env.BASE_URL,
                 urlApi = process.env.URL_API,
                 cleGroupe = process.env.CLE_GROUPE,
-                printerUrl
+                printerUrl,
+                printerName
               }) {
     // this.printerUrl = `http://${printerHost}:${printerPort}${printerUri}`
     this.printerUrl = printerUrl
     this.baseUrl = baseUrl
     this.urlApi = urlApi
     this.cleGroupe = cleGroupe
-    this.printerData = new Printer_data(this.printerUrl)
+    this.printerName = printerName
+    // this.printerData = new Printer_data(this.printerUrl)
     // this.printerData.fetch_data()
   }
 
@@ -70,7 +76,7 @@ class Printer {
   get_images_to_print(cb) {
     const self = this
     const url = `${self.baseUrl}${self.urlApi}?p_cle_groupe=${self.cleGroupe}`
-    console.log(url)
+    // console.log(url)
     axios.get(url).then(response => {
       const files = response.data
       // console.log(files)
@@ -95,16 +101,56 @@ class Printer {
 
   async print(image) {
     // Create a new IPP printer object
+    const self = this
+
     const myImg = this.imgs.find(img => img.cle_auto_print === image.cle_auto_print)
     myImg.status = 'sended'
 
-    const printer = ipp.Printer(this.printerUrl);
+    // const printer = ipp.Printer(this.printerUrl);
 
 
     console.log(`${this.baseUrl}${image.url}`)
     // console.log(image)
     const response = await axios.get(`${this.baseUrl}${image.url}`,  { responseType: 'arraybuffer' })
     const imageData = Buffer.from(response.data, "utf-8")
+
+    const imageUrl = `${this.baseUrl}${image.url}`
+    axios({
+      method: 'get',
+      url: imageUrl,
+      responseType: 'stream'
+    })
+        .then(response => {
+          // Récupérer le nom du fichier à partir de l'URL
+          const filename = path.basename(imageUrl);
+
+          // Emplacement où enregistrer l'image
+          const imagePath = `./${filename}`;
+          console.log('imagePath')
+          console.log(imagePath)
+
+          // Enregistrer l'image en local
+          response.data.pipe(fs.createWriteStream(imagePath));
+
+          const cmd = `"${process.env.IRFANVIEW_PATH}/i_view64_2.exe" ${filename} /print="${self.printerName}" /ini=./i_view64.ini`
+          console.log(cmd)
+          // Lorsque l'enregistrement est terminé, exécuter une commande dans le terminal
+
+          response.data.on('end', () => {
+            exec(cmd, (error, stdout, stderr) => {
+              if (error) {
+                console.error(`Une erreur s'est produite : ${error}`);
+                return;
+              }
+              console.log(`stdout: ${stdout}`);
+              console.error(`stderr: ${stderr}`);
+              this.set_printed(image)
+            });
+          });
+        })
+        .catch(error => {
+          console.error(`Une erreur s'est produite : ${error}`);
+        });
 
     console.log(imageData.length)
     // console.log(imageData)
@@ -130,30 +176,24 @@ class Printer {
     // })
 
     // Submit the print job to the printer
-    printer.execute('Print-Job', job, (error, response) => {
-      if (error) {
-        console.error(`Error submitting print job: ${error}`);
-        myImg.status = 'pending'
-        return;
-      }
-      // console.log(response)
-      if (response.statusCode === 'successful-ok') {
-        console.log('Print job submitted successfully');
-        myImg.status = 'printed'
-        myImg.jobId = response.id
-        // (
-        //   async ()=>{
-        //     const interval = setInterval(()=>{
-        //
-        //     },500)
-        //   }
-        // )
-        this.set_printed(image)
-      } else {
-        console.error(`Error submitting print job: ${response.statusCode}`);
-        myImg.status = 'pending'
-      }
-    });
+    // printer.execute('Print-Job', job, (error, response) => {
+    //   if (error) {
+    //     console.error(`Error submitting print job: ${error}`);
+    //     myImg.status = 'pending'
+    //     return;
+    //   }
+    //   // console.log(response)
+    //   if (response.statusCode === 'successful-ok') {
+    //     console.log('Print job submitted successfully');
+    //     myImg.status = 'printed'
+    //     myImg.jobId = response.id
+    //
+    //     // this.set_printed(image)
+    //   } else {
+    //     console.error(`Error submitting print job: ${response.statusCode}`);
+    //     myImg.status = 'pending'
+    //   }
+    // });
   }
 
   set_printed(image) {

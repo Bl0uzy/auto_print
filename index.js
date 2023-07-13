@@ -1,15 +1,19 @@
 const Printer = require('./printer/index.js')
 const discover = require('./test.js')
 const readline = require('readline');
+const { exec } = require('child_process');
+const i_view_config = require('./write_i_view_config.js')
 
 let printer;
 
-start()
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
+
+start()
+
 
 function handleCommand(command,params) {
   switch (command) {
@@ -114,23 +118,89 @@ function handleCommand(command,params) {
 
 
 async function start() {
-  urls = await discover()
-  for (let i = 0; i < urls.length; i++) {
-    console.log(`${i} : ${urls[i]}`)
-  }
-  let answer;
-  while (isNaN(answer) || !(parseInt(answer) >= 0 && parseInt(answer) < urls.length)) {
+  // urls = await discover()
+  // for (let i = 0; i < urls.length; i++) {
+  //   console.log(`${i} : ${urls[i]}`)
+  // }
+  // let answer;
+  // while (isNaN(answer) || !(parseInt(answer) >= 0 && parseInt(answer) < urls.length)) {
+  //   await new Promise(resolve => {
+  //     rl.question(`Choisi un url [${0} - ${urls.length - 1}] : `,(data)=>{
+  //       answer = data
+  //       resolve()
+  //     })
+  //   })
+  // }
+  // // rl.close()
+  //
+  //
+  // printer = new Printer({printerUrl : urls[parseInt(answer)]})
+  let printers = [];
+  await new Promise((resolve)=>{
+    exec('wmic printer list brief', (err, stdout, stderr) => {
+      if (err) {
+        // node couldn't execute the command
+        resolve()
+        return;
+      }
+      // list of printers with brief details
+      console.log(stdout);
+      // the *entire* stdout and stderr (buffered)
+      stdout = stdout.split("  ");
+      j = 0;
+      stdout = stdout.filter(item => item);
+      for (i = 0; i < stdout.length; i++) {
+        if (stdout[i] == " \r\r\n" || stdout[i] == "\r\r\n") {
+          printers[j] = stdout[i + 1].trim();
+          console.log(`${j} : ${printers[j]}`);
+          j++;
+        }
+      }
+      resolve()
+      // list of only printers name
+      // console.log('printers');
+      // console.log(printers);
+      // console.log('stderr');
+      // console.log(stderr);
+    });
+  })
+
+  let printerName;
+  let printerFormat;
+
+  let printerAnswer;
+  while (isNaN(printerAnswer) || !(parseInt(printerAnswer) >= 0 && parseInt(printerAnswer) < printers.length)) {
     await new Promise(resolve => {
-      rl.question(`Choisi un url [${0} - ${urls.length - 1}] : `,(data)=>{
-        answer = data
+      rl.question(`Choisi une imprimante [${0} - ${printers.length - 1}] : `, (data) => {
+        printerAnswer = data
         resolve()
       })
     })
   }
-  // rl.close()
+  printerName = printers[printerAnswer]
+  console.log(`Imprimante ${printerName} choisi`)
 
+  let formatAnswer;
+  const formats = ['(6x9)','(8x6)','(6x6)'];
+  while (isNaN(formatAnswer) || !(parseInt(formatAnswer) >= 0 && parseInt(formatAnswer) < formats.length)) {
+    for (let i = 0; i < formats.length; i++) {
+      console.log(`${i} : ${formats[i]}`);
+    }
+    await new Promise(resolve => {
+      rl.question(`Choisi un format [0 - ${formats.length - 1}] : `, (data) => {
+        formatAnswer = data
+        resolve()
+      })
+    })
+  }
+  printerFormat = formats[formatAnswer]
+  console.log(`Format ${printerFormat} choisi`)
 
-  printer = new Printer({printerUrl : urls[parseInt(answer)]})
+  await i_view_config(printerName,printerFormat)
+
+  // return;
+
+  printer = new Printer({printerName})
   printer.start()
 
   console.log('Script started.');
@@ -152,7 +222,7 @@ async function start() {
     console.log(`Command: ${command}`);
     // console.log(`Params: ${params}`);
 
-    handleCommand(command,params);
+    handleCommand(command, params);
   });
 
 }
