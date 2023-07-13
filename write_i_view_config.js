@@ -62,7 +62,7 @@ File13=
 File14=`;
 
   await new Promise((resolve, reject)=>{
-    fs.writeFile('i_view64_2.ini', contenuDuFichier, function (erreur) {
+    fs.writeFile('i_view64_2.ini', contenuDuFichier,{encoding:'UTF16LE'}, function (erreur) {
       if (erreur) {
         reject()
         throw erreur
