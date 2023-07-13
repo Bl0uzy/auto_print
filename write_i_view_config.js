@@ -17,7 +17,7 @@ Height=1400
 Maximized=0
 [Print]
 AlwaysDefPrinter=0
-AutoRotate=1
+AutoRotate=0
 Option=1
 Left=0.00
 Top=0.00
@@ -38,7 +38,7 @@ FootTxt=
 FontParam=-13|0|0|0|400|0|0|0|0|1|2|4|49|
 Font=Courier New
 Printer=${printerName}
-Orient=2
+Orient=1
 Size=127
 Src=15
 Color=2
