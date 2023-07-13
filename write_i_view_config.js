@@ -17,7 +17,7 @@ Height=1400
 Maximized=0
 [Print]
 AlwaysDefPrinter=0
-AutoRotate=0
+AutoRotate=1
 Option=1
 Left=0.00
 Top=0.00
