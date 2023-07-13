@@ -132,7 +132,7 @@ class Printer {
           // Enregistrer l'image en local
           response.data.pipe(fs.createWriteStream(imagePath));
 
-          const cmd = `"${process.env.IRFANVIEW_PATH}/i_view64.exe" ${filename} /print="${self.printerName}" /ini=./i_view64_2.ini`
+          const cmd = `"${process.env.IRFANVIEW_PATH}/i_view64.exe" ${filename} /print="${self.printerName}" /ini=.`
           console.log(cmd)
           // Lorsque l'enregistrement est terminé, exécuter une commande dans le terminal
 
