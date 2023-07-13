@@ -61,8 +61,10 @@ File12=
 File13=
 File14=`;
 
+  contenuDuFichier.replace(/\n/g, "\r");
+
   await new Promise((resolve, reject)=>{
-    fs.writeFile('i_view64_2.ini', contenuDuFichier,{encoding:'UTF16LE'}, function (erreur) {
+    fs.writeFile('i_view64_2.ini', "\ufeff" + contenuDuFichier,{encoding:'utf16le',ignoreBOM:false}, function (erreur) {
       if (erreur) {
         reject()
         throw erreur
