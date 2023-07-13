@@ -1,7 +1,8 @@
 const fs = require('fs');
 
 async function writeFile(printerName,printerFormat) {
-  const contenuDuFichier = `
+  const contenuDuFichier = `; UNICODE FILE - edit with care ;-)
+
 [Print]
 AlwaysDefPrinter=0
 AutoRotate=1
