@@ -14,7 +14,6 @@ const rl = readline.createInterface({
 
 start()
 
-
 function handleCommand(command,params) {
   switch (command) {
     case 'exit':
@@ -116,7 +115,6 @@ function handleCommand(command,params) {
   }
 }
 
-
 async function start() {
   // urls = await discover()
   // for (let i = 0; i < urls.length; i++) {
@@ -135,6 +133,7 @@ async function start() {
   //
   //
   // printer = new Printer({printerUrl : urls[parseInt(answer)]})
+  //////////////////////////////////////////////////////////////////////
   let printers = [];
   await new Promise((resolve)=>{
     exec('wmic printer list brief', (err, stdout, stderr) => {
@@ -157,11 +156,6 @@ async function start() {
         }
       }
       resolve()
-      // list of only printers name
-      // console.log('printers');
-      // console.log(printers);
-      // console.log('stderr');
-      // console.log(stderr);
     });
   })
 
@@ -179,31 +173,34 @@ async function start() {
   }
   printerName = printers[printerAnswer]
   console.log(`Imprimante ${printerName} choisi`)
+  //
+  // let formatAnswer;
+  // const formats = ['(6x9)','(8x6)','(6x6)'];
+  // while (isNaN(formatAnswer) || !(parseInt(formatAnswer) >= 0 && parseInt(formatAnswer) < formats.length)) {
+  //   for (let i = 0; i < formats.length; i++) {
+  //     console.log(`${i} : ${formats[i]}`);
+  //   }
+  //   await new Promise(resolve => {
+  //     rl.question(`Choisi un format [0 - ${formats.length - 1}] : `, (data) => {
+  //       formatAnswer = data
+  //       resolve()
+  //     })
+  //   })
+  // }
+  // printerFormat = formats[formatAnswer]
+  // console.log(`Format ${printerFormat} choisi`)
 
-  let formatAnswer;
-  const formats = ['(6x9)','(8x6)','(6x6)'];
-  while (isNaN(formatAnswer) || !(parseInt(formatAnswer) >= 0 && parseInt(formatAnswer) < formats.length)) {
-    for (let i = 0; i < formats.length; i++) {
-      console.log(`${i} : ${formats[i]}`);
-    }
-    await new Promise(resolve => {
-      rl.question(`Choisi un format [0 - ${formats.length - 1}] : `, (data) => {
-        formatAnswer = data
-        resolve()
-      })
-    })
-  }
-  printerFormat = formats[formatAnswer]
-  console.log(`Format ${printerFormat} choisi`)
+  exec(`"${process.env.IRFANVIEW_PATH}/i_view64.exe" WEB_PHOTOS-1173363E1E934782A85C6CCA873789A2.jpg /ini=.`, (err, stdout, stderr) => {})
 
   await i_view_config(printerName,printerFormat)
 
   // return;
 
-  printer = new Printer({printerName})
-  printer.start()
+  printer = new Printer({})
+  // printer.start()
 
-  console.log('Script started.');
+  console.log('Écrit "start" pour commencer')
+
   rl.on('line', (input) => {
     console.log('-----------------------------------')
     const commandParts = input.trim().split(' ');

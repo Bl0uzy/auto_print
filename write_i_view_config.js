@@ -69,7 +69,6 @@ File14=`;
         reject()
         throw erreur
       }
-      console.log('Le fichier a été écrit avec succès');
       resolve()
     });
   })
