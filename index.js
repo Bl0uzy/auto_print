@@ -192,7 +192,7 @@ async function start() {
 
   exec(`"${process.env.IRFANVIEW_PATH}/i_view64.exe" WEB_PHOTOS-1173363E1E934782A85C6CCA873789A2.jpg /ini=.`, (err, stdout, stderr) => {})
 
-  await i_view_config(printerName,printerFormat)
+  // await i_view_config(printerName,printerFormat)
 
   // return;
 
